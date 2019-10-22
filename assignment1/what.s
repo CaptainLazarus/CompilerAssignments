@@ -30,7 +30,7 @@ what:
     jmp .L3                 # jump to L3
 .L7:
     movl -8(%rbp), %eax     # eax = j
-    cltq                    # rax = eax
+    cltq                    # rax = ea
     leaq 0(,%rax,4), %rdx   # rdx = 4*j
     movq -24(%rbp), %rax    # rax =  data[0]
     addq %rdx, %rax         # rax = 4*j + rax = data[j] 
