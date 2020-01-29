@@ -1,0 +1,74 @@
+%{
+#include<iostream>
+#include<string>
+#include<cstring>
+#include<sstream>
+using namespace std;
+
+extern int yylex();
+extern int yylineno;
+extern int yyparse();
+extern FILE* yyin;
+
+void yyerror(const char* s);
+#define YYDEBUG 1
+
+
+%}
+
+%union
+{
+	int ic;
+	float fc;
+	char *str;
+}
+
+%token  minus_token mult_token div_token eq_token less_token greater_token lbrac_token rbrac_token assign_token semicolon_token colon_token and_token or_token not_token
+%token if_token else_token int_token real_token do_token nop_token print_token read_token then_token while_token
+%token<ic> ic_token
+%token<fc> fc_token
+%token<str> str_token id_token
+
+%nonassoc if_token int_token real_token do_token nop_token print_token read_token while_token lbrac_token rbrac_token semicolon_token colon_token
+%precedence then_token
+%precedence else_token
+
+%left assign_token
+%left and_token or_token
+%left eq_token
+%left less_token greater_token
+%left plus_token minus_token
+%left mult_token div_token
+%right not_token UMINUS
+
+%%
+P:		DL SL
+DL:		 | DL D
+D:		VL colon_token TY
+TY:		int_token | real_token
+VL:		VL id_token | id_token
+SL:		SL S | S
+S:		AS | IS | LS | IOS | nop_token
+AS:		id_token assign_token E
+IS:		if_token BE then_token SL else_token SL semicolon_token
+LS:		while_token BE do_token SL semicolon_token
+IOS:	print_token PE | read_token id_token
+PE:		E | str_token
+BE:		BE or_token BE | BE and_token BE | not_token BE | lbrac_token BE rbrac_token | RE
+RE:		E eq_token E | E less_token E | E greater_token E
+E:		E '+' E | E minus_token E | E mult_token E | E div_token E | minus_token E %prec UMINUS | lbrac_token E rbrac_token | id_token | ic_token | fc_token
+%%
+
+int main() {
+	yyin = stdin;
+	yydebug = 1;
+	do {
+		yyparse();
+	} while(!feof(yyin));
+	return 0;
+}
+
+void yyerror(const char* s) {
+	fprintf(stderr, "%s at line no: %d\n", s, yylineno);
+	exit(1);
+}

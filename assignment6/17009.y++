@@ -25,12 +25,15 @@ extern char yytext[];
 %token <real> FC 
 %token <str> STRING ID
 %token INT WHILE DO IF THEN ELSE NOP PRINT REAL READ COMP/* tokens and types   */
+
 %left '&'
 %left '|'
 %left '-' '+'
 %left '*' '/'
-%left UNEG
+
+%right UNEG
 %left '~'           
+
 
 %start p
 
@@ -56,7 +59,7 @@ vl: vl ID
   | ID
 ;
 
-sl: sl s
+sl: s sl
   | s
 ;
 
@@ -98,12 +101,12 @@ re: exp COMP exp
 
 exp: IC              
    | FC   
-   | ID      
+   | ID          
    | exp '+' exp        
    | exp '-' exp         
-   | exp '*' exp         
    | exp '/' exp         
    | '-' exp %prec UNEG
+   | exp '*' exp     
    | '(' exp ')'         
 ;
 
